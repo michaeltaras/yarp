@@ -2499,6 +2499,34 @@ parse_expression_prefix(yp_parser_t *parser) {
 
       return yp_node_call_node_create(parser, receiver, &call_operator, &operator_token, &lparen, NULL, &rparen, name);
     }
+    case YP_TOKEN_KEYWORD_NOT: {
+      yp_token_t operator_token = parser->previous;
+
+      yp_token_t lparen;
+      if (accept(parser, YP_TOKEN_PARENTHESIS_LEFT)) {
+        lparen = parser->previous;
+      } else {
+        not_provided(&lparen, parser->previous.end);
+      }
+
+      yp_node_t *receiver = parse_expression(parser, binding_powers[operator_token.type].right, "Expected a receiver after `not`.");
+
+      yp_token_t rparen;
+      if (!parser->recovering && lparen.type == YP_TOKEN_PARENTHESIS_LEFT) {
+        expect(parser, YP_TOKEN_PARENTHESIS_RIGHT, "Expected ')' after left parenthesis.");
+        rparen = parser->previous;
+      } else {
+        not_provided(&rparen, parser->previous.end);
+      }
+
+      yp_token_t call_operator;
+      not_provided(&call_operator, operator_token.start);
+
+      yp_string_t *name = yp_string_alloc();
+      yp_string_shared_init(name, operator_token.start, operator_token.end);
+
+      return yp_node_call_node_create(parser, receiver, &call_operator, &operator_token, &lparen, NULL, &rparen, name);
+    }
     case YP_TOKEN_STRING_BEGIN: {
       yp_token_t opening = parser->previous;
 

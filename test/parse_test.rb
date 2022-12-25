@@ -1081,6 +1081,14 @@ class ParseTest < Test::Unit::TestCase
     assert_parses CallNode(expression("1"), nil, TILDE("~"), nil, nil, nil, "~"), "~1"
   end
 
+  test "not" do
+    assert_parses CallNode(expression("1"), nil, KEYWORD_NOT("not"), nil, nil, nil, "not"), "not 1"
+  end
+
+  test "not with parentheses" do
+    assert_parses CallNode(expression("1"), nil, KEYWORD_NOT("not"), PARENTHESIS_LEFT("("), nil, PARENTHESIS_RIGHT(")"), "not"), "not(1)"
+  end
+
   test "undef bare" do
     assert_parses UndefNode(KEYWORD_UNDEF("undef"), [SymbolNode(nil, IDENTIFIER("a"), nil)]), "undef a"
   end
